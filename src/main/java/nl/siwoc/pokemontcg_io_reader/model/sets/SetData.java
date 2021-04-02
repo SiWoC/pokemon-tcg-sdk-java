@@ -14,12 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
+
 package nl.siwoc.pokemontcg_io_reader.model.sets; 
-import java.util.List; 
+
 public class SetData{
-    public List<Set> data;
-    public int page;
-    public int pageSize;
-    public int count;
-    public int totalCount;
+    public Set data;
 }

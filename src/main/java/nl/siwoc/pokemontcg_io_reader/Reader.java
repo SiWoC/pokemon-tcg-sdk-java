@@ -21,11 +21,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.siwoc.pokemontcg_io_reader.model.cards.Card;
-import nl.siwoc.pokemontcg_io_reader.model.cards.CardData;
-import nl.siwoc.pokemontcg_io_reader.model.common.SimpleData;
-import nl.siwoc.pokemontcg_io_reader.model.sets.Set;
-import nl.siwoc.pokemontcg_io_reader.model.sets.SetData;
+import nl.siwoc.pokemontcg_io_reader.model.cards.*;
+import nl.siwoc.pokemontcg_io_reader.model.common.*;
+import nl.siwoc.pokemontcg_io_reader.model.sets.*;
 import nl.siwoc.pokemontcg_io_reader.utils.HttpUtils;
 
 public class Reader {
@@ -35,24 +33,26 @@ public class Reader {
 	public static void main(String[] args) throws Exception {
 		System.out.println(getRarities());
 		//getSets();
-		List<Card> cards = getCardsByQuery("?q=set.id:base1");
+		List<Card> cards = getCardsByQuery("?q=set.id:base1").data;
 		System.out.println(cards.size());
 		for (Card card : cards) {
 			System.out.println(card.id + " " + card.nationalPokedexNumbers + " " + card.name);
-			if (card.id.equals("base1-8")) {
-				System.out.println(card.id + "found");
-			}
-			if (card.tcgplayer != null && card.tcgplayer.prices != null) {
-				if (card.tcgplayer.prices.firstEditionHolofoil != null
-						|| card.tcgplayer.prices.firstEditionNormal != null) {
-					System.out.println(card.id + "filled");
-				}
-			}
 		}
 	}
 
-	public static List<Card> getCardsByQuery(String query) throws Exception {
-		List<Card> cards = null;
+	/**
+	 * You can call this with a query like "?q=set.id:base1" or "?page=5"
+	 * You need to provide the ? questionmark as well
+	 * So you can also leave it empty to get all cards (which will return only max 250)
+	 * 
+	 * @param query
+	 * @return CardsData which holds a List<Card> data and pagination info
+	 * @throws Exception
+	 * 
+	 * @see <a href="https://docs.pokemontcg.io/#api_v2cards_list">https://docs.pokemontcg.io/#api_v2cards_list</a>
+	 */
+	public static CardsData getCardsByQuery(String query) throws Exception {
+		CardsData cardsData = null;
 		HttpURLConnection conn = null;
 		
 		try {
@@ -60,13 +60,40 @@ public class Reader {
 			conn = HttpUtils.getConnection(url);
 			if (conn.getResponseCode() != 200) {
 				if (conn.getResponseCode() == 404) {
-					return cards;
+					return cardsData;
+				}
+				throw new Exception("Failed : HTTP error code : " + conn.getResponseCode());
+			}
+			
+			cardsData = mapper.readValue(conn.getInputStream(), CardsData.class);
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (conn != null) {
+				conn.disconnect();
+			}
+		}
+
+		return cardsData;
+	}
+	
+	public static Card getCardById(String id) throws Exception {
+		Card card = null;
+		HttpURLConnection conn = null;
+		
+		try {
+			String url = Constants.BASE_URL + "v2/cards/" + id;
+			conn = HttpUtils.getConnection(url);
+			if (conn.getResponseCode() != 200) {
+				if (conn.getResponseCode() == 404) {
+					return card;
 				}
 				throw new Exception("Failed : HTTP error code : " + conn.getResponseCode());
 			}
 			
 			CardData cardData = mapper.readValue(conn.getInputStream(), CardData.class);
-			cards = cardData.data;
+			card = cardData.data;
 			
 		} catch (Exception e) {
 			throw e;
@@ -76,25 +103,25 @@ public class Reader {
 			}
 		}
 
-		return cards;
+		return card;
 	}
-	
-	public static List<Set> getSets() throws Exception {
-		List<Set> sets = null;
+
+	public static Set getSetById(String id) throws Exception {
+		Set set = null;
 		HttpURLConnection conn = null;
 		
 		try {
-			String url = Constants.BASE_URL + "v2/sets";
+			String url = Constants.BASE_URL + "v2/sets/" + id;
 			conn = HttpUtils.getConnection(url);
 			if (conn.getResponseCode() != 200) {
 				if (conn.getResponseCode() == 404) {
-					return sets;
+					return set;
 				}
 				throw new Exception("Failed : HTTP error code : " + conn.getResponseCode());
 			}
 			
 			SetData setData = mapper.readValue(conn.getInputStream(), SetData.class);
-			sets = setData.data;
+			set = setData.data;
 			
 		} catch (Exception e) {
 			throw e;
@@ -104,7 +131,45 @@ public class Reader {
 			}
 		}
 
-		return sets;
+		return set;
+	}
+	
+	/**
+	 * You can call this with a query like "?q=legalities.standard:legal" or "?page=2&pageSize=10"
+	 * You need to provide the ? questionmark as well
+	 * So you can also leave it empty to get all sets (which will fit in the max 250)
+	 * 
+	 * @param query
+	 * @return SetsData which holds a List<Set> data and pagination info
+	 * @throws Exception
+	 * 
+	 * @see <a href="https://docs.pokemontcg.io/#api_v2sets_list">https://docs.pokemontcg.io/#api_v2sets_list</a>
+	 */
+	public static SetsData getSetsByQuery(String query) throws Exception {
+		SetsData setsData = null;
+		HttpURLConnection conn = null;
+		
+		try {
+			String url = Constants.BASE_URL + "v2/sets" + query;
+			conn = HttpUtils.getConnection(url);
+			if (conn.getResponseCode() != 200) {
+				if (conn.getResponseCode() == 404) {
+					return setsData;
+				}
+				throw new Exception("Failed : HTTP error code : " + conn.getResponseCode());
+			}
+			
+			setsData = mapper.readValue(conn.getInputStream(), SetsData.class);
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			if (conn != null) {
+				conn.disconnect();
+			}
+		}
+
+		return setsData;
 	}
 
 	public static List<String> getTypes() throws Exception {
