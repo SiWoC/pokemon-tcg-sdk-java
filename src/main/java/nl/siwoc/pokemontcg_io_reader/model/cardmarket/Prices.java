@@ -14,24 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-package nl.siwoc.pokemontcg_io_reader.model.tcgplayer;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package nl.siwoc.pokemontcg_io_reader.model.cardmarket;
 
 public class Prices {
-	public Values normal;
-	public Values holofoil;
-	public Values reverseHolofoil;
-	public Values unlimited;
-	public Values unlimitedHolofoil;
-	
-	@JsonProperty("1stEdition")
-	public Values firstEdition;
-
-	@JsonProperty("1stEditionHolofoil")
-	public Values firstEditionHolofoil;
-	
-	@JsonProperty("1stEditionNormal")
-	public Values firstEditionNormal;
+	public float averageSellPrice;
+	public float lowPrice;
+	public float trendPrice;
+	public float germanProLow;
+	public float suggestedPrice;
+	public float reverseHoloSell;
+	public float reverseHoloLow;
+	public float reverseHoloTrend;
+	public float lowPriceExPlus;
+	public float avg1;
+	public float avg7;
+	public float avg30;
+	public float reverseHoloAvg1;
+	public float reverseHoloAvg7;
+	public float reverseHoloAvg30;
 }
 

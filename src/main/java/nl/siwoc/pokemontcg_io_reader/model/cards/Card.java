@@ -18,6 +18,7 @@ package nl.siwoc.pokemontcg_io_reader.model.cards;
 
 import java.util.List;
 
+import nl.siwoc.pokemontcg_io_reader.model.cardmarket.CardMarket;
 import nl.siwoc.pokemontcg_io_reader.model.common.Legalities;
 import nl.siwoc.pokemontcg_io_reader.model.sets.Set;
 import nl.siwoc.pokemontcg_io_reader.model.tcgplayer.TCGPlayer; 
@@ -47,6 +48,8 @@ public class Card{
     public String flavorText;
     public List<Integer> nationalPokedexNumbers;
     public Legalities legalities;
-    public TCGPlayer tcgplayer;
+    public String regulationMark;
     public Images images;
+    public TCGPlayer tcgplayer;
+    public CardMarket cardmarket;
 }
